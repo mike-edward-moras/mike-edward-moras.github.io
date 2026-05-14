@@ -92,10 +92,8 @@
         <tr>
           <th>Certificate Name</th>
           <th>Issuer</th>
-          <th>Started On</th>
-          <th>Finished On</th>
-          <th>License Number</th>
-          <th>Certificate URL</th>
+          <th>Year</th>
+          <th>Verification</th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
@@ -119,7 +117,7 @@
       if (data.length === 0) {
         tableBody.innerHTML = `
           <tr>
-            <td colspan="6">No certificates found.</td>
+            <td colspan="4">No certificates found.</td>
           </tr>
         `;
         return;
@@ -131,11 +129,26 @@
         row.innerHTML = `
           <td>${cert.Name || ''}</td>
           <td>${cert.Authority || ''}</td>
-          <td>${cert['Started On'] || ''}</td>
-          <td>${cert['Finished On'] || ''}</td>
-          <td>${cert['License Number'] || ''}</td>
+          <td>${(cert['Started On'] || '').toString().match(/\d{4}/)?.[0] || ''}</td>
           <td>
-            ${cert.Url ? `<a href="${cert.Url}" target="_blank">View Certificate</a>` : ''}
+            ${(() => {
+              const license = cert['License Number'] || '';
+              const url = cert.Url || '';
+
+              if (license && url) {
+                return `<a href="${url}" target="_blank">${license}</a>`;
+              }
+
+              if (license && !url) {
+                return license;
+              }
+
+              if (!license && url) {
+                return `<a href="${url}" target="_blank">Verify</a>`;
+              }
+
+              return '-/-';
+            })()}
           </td>
         `;
 
