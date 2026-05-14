@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Certifications</title>
+  <title>Mike Edward Moras : Certificates</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <style>
@@ -44,7 +44,7 @@
       animation: fadeUp 0.6s ease forwards;
     }
 
-    .eyebrow {
+    h1 {
       font-family: 'DM Mono', monospace;
       font-size: 11px;
       letter-spacing: 2.5px;
@@ -53,7 +53,7 @@
       margin-bottom: 12px;
     }
 
-    h1 {
+    h2 {
       font-family: 'Cormorant Garamond', serif;
       font-size: clamp(36px, 6vw, 56px);
       font-weight: 600;
@@ -178,7 +178,12 @@
       text-decoration: none;
       border: 1px solid var(--accent-dim);
       padding: 5px 12px;
+      display: inline-block;
+      max-width: calc(8ch + 24px); /* 8ch text + padding */
+      overflow: hidden;
+      text-overflow: ellipsis;
       white-space: nowrap;
+      vertical-align: middle;
       transition: background 0.15s, color 0.15s;
     }
 
@@ -191,6 +196,12 @@
       font-family: 'DM Mono', monospace;
       font-size: 11px;
       color: var(--muted);
+      display: inline-block;
+      max-width: 8ch;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      vertical-align: middle;
     }
 
     /* highlight */
@@ -234,8 +245,8 @@
 <body>
 
   <header>
-    <p class="eyebrow">Professional Record</p>
-    <h1>Certifications</h1>
+    <h1 class="eyebrow">Mike Edward Moras</h1>
+    <h2>Certificates</h2>
     <div class="header-rule"></div>
   </header>
 
@@ -331,9 +342,9 @@
 
       let verHtml = '';
       if (verification && url) {
-        verHtml = `<a class="verify-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${hl(verification, q)}</a>`;
+        verHtml = `<a class="verify-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer" title="${esc(verification)}">${hl(verification, q)}</a>`;
       } else if (verification) {
-        verHtml = `<span class="verify-text">${hl(verification, q)}</span>`;
+        verHtml = `<span class="verify-text" title="${esc(verification)}">${hl(verification, q)}</span>`;
       }
 
       return `<div class="cert-card" style="animation-delay:${i * 18}ms">
