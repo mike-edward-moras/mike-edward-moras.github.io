@@ -3,217 +3,259 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Certification Viewer</title>  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>  <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f8;
       margin: 0;
       padding: 24px;
-      color: #222;
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      color: #1f2937;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
     }
 
     h1 {
-      margin-bottom: 20px;
+      margin: 0 0 20px;
+      font-size: 28px;
     }
 
-    .controls {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
+    .toolbar {
+      margin-bottom: 18px;
     }
 
-    select,
-    input {
-      padding: 10px 12px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+    .search {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
       font-size: 14px;
+      outline: none;
     }
 
-    .table-container {
+    .search:focus {
+      border-color: #2563eb;
+    }
+
+    .table-wrapper {
       overflow-x: auto;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 900px;
     }
 
     thead {
-      background: #1f2937;
+      background: #111827;
       color: white;
     }
 
     th,
     td {
-      padding: 12px 14px;
-      border-bottom: 1px solid #e5e7eb;
+      padding: 14px 16px;
       text-align: left;
+      border-bottom: 1px solid #e5e7eb;
     }
 
-    tr:hover {
+    th {
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    tbody tr:hover {
       background: #f9fafb;
     }
 
     a {
       color: #2563eb;
       text-decoration: none;
+      font-weight: 500;
     }
 
     a:hover {
       text-decoration: underline;
     }
 
-    .loading {
+    .status {
       padding: 20px;
       background: white;
-      border-radius: 10px;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    }
+
+    .empty {
+      text-align: center;
+      color: #6b7280;
     }
   </style></head>
 <body>
-  <h1>Certification Viewer</h1>  <div class="controls">
-    <select id="sortField">
-      <option value="Name">Sort by Certificate Name</option>
-      <option value="Authority">Sort by Issuer</option>
-    </select><select id="sortDirection">
-  <option value="asc">Ascending</option>
-  <option value="desc">Descending</option>
-</select>
+  <div class="container">
+    <h1>Certification Viewer</h1><div class="toolbar">
+  <input
+    type="text"
+    id="searchInput"
+    class="search"
+    placeholder="Search issuer or certificate name..."
+  />
+</div>
 
-<input type="text" id="searchInput" placeholder="Search certificates..." />
+<div id="status" class="status">Loading certifications...</div>
 
-  </div>  <div id="status" class="loading">Loading CSV data...</div>  <div class="table-container" style="display:none;" id="tableWrapper">
-    <table>
-      <thead>
-        <tr>
-          <th>Issuer</th>
-          <th>Certificate Name</th>
-          <th>Year</th>
-          <th>Verification</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody"></tbody>
-    </table>
+<div id="tableWrapper" class="table-wrapper" style="display:none;">
+  <table>
+    <thead>
+      <tr>
+        <th data-sort="Authority">Issuer</th>
+        <th data-sort="Name">Certificate Name</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+</div>
+
   </div>  <script>
     const CSV_FILE = 'Certifications.csv';
 
+    const tableBody = document.getElementById('tableBody');
+    const searchInput = document.getElementById('searchInput');
+    const tableWrapper = document.getElementById('tableWrapper');
+    const status = document.getElementById('status');
+    const headers = document.querySelectorAll('th[data-sort]');
+
     let certifications = [];
 
-    const tableBody = document.getElementById('tableBody');
-    const status = document.getElementById('status');
-    const tableWrapper = document.getElementById('tableWrapper');
+    let currentSort = {
+      field: 'Authority',
+      direction: 'desc'
+    };
 
-    const sortField = document.getElementById('sortField');
-    const sortDirection = document.getElementById('sortDirection');
-    const searchInput = document.getElementById('searchInput');
+    function compareValues(a, b, direction = 'asc') {
+      const valueA = (a || '').toString().toLowerCase();
+      const valueB = (b || '').toString().toLowerCase();
+
+      if (valueA < valueB) return direction === 'asc' ? -1 : 1;
+      if (valueA > valueB) return direction === 'asc' ? 1 : -1;
+      return 0;
+    }
+
+    function getCertificateName(cert) {
+      const name = cert.Name || 'Untitled';
+      const license = cert['License Number'] || '';
+      const url = cert.Url || '';
+
+      if (url) {
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${name}</a>`;
+      }
+
+      if (license) {
+        const escapedLicense = license.replace(/'/g, "\'");
+
+        return `
+          <a
+            href="#"
+            onclick="alert('${escapedLicense}'); return false;"
+          >
+            ${name}
+          </a>
+        `;
+      }
+
+      return name;
+    }
 
     function renderTable(data) {
-      tableBody.innerHTML = '';
-
-      if (data.length === 0) {
+      if (!data.length) {
         tableBody.innerHTML = `
           <tr>
-            <td colspan="4">No certificates found.</td>
+            <td colspan="2" class="empty">No certificates found.</td>
           </tr>
         `;
         return;
       }
 
-      data.forEach(cert => {
-        const row = document.createElement('tr');
-
-        row.innerHTML = `
+      tableBody.innerHTML = data.map(cert => `
+        <tr>
           <td>${cert.Authority || ''}</td>
-          <td>${cert.Name || ''}</td>
-          <td>${(cert['Started On'] || '').toString().match(/\d{4}/)?.[0] || ''}</td>
-          <td>
-            ${(() => {
-              const license = cert['License Number'] || '';
-              const url = cert.Url || '';
-
-              if (license && url) {
-                return `<a href="${url}" target="_blank">Verify</a>`;
-              }
-
-              if (license && !url) {
-                return `<a href="#" onclick="alert('${license.replace(/'/g, "\'")}'); return false;">Certificate ID</a>`;
-              }
-
-              if (!license && url) {
-                return `<a href="${url}" target="_blank">Verify</a>`;
-              }
-
-              return '-/-';
-            })()}
-          </td>
-        `;
-
-        tableBody.appendChild(row);
-      });
+          <td>${getCertificateName(cert)}</td>
+        </tr>
+      `).join('');
     }
 
     function applyFiltersAndSort() {
-      certifications.sort((a, b) => {
-        const issuerA = (a.Authority || '').toLowerCase();
-        const issuerB = (b.Authority || '').toLowerCase();
-
-        if (issuerA < issuerB) return 1;
-        if (issuerA > issuerB) return -1;
-
-        const nameA = (a.Name || '').toLowerCase();
-        const nameB = (b.Name || '').toLowerCase();
-
-        if (nameA < nameB) return -1;
-        if (nameA > nameB) return 1;
-
-        return 0;
-      });
-      const field = sortField.value;
-      const direction = sortDirection.value;
-      const search = searchInput.value.toLowerCase().trim();
+      const search = searchInput.value.trim().toLowerCase();
 
       let filtered = certifications.filter(cert => {
         return (
-          (cert.Name || '').toLowerCase().includes(search) ||
-          (cert.Authority || '').toLowerCase().includes(search)
+          (cert.Authority || '').toLowerCase().includes(search) ||
+          (cert.Name || '').toLowerCase().includes(search)
         );
       });
 
       filtered.sort((a, b) => {
-        const valueA = (a[field] || '').toLowerCase();
-        const valueB = (b[field] || '').toLowerCase();
+        const primary = compareValues(
+          a[currentSort.field],
+          b[currentSort.field],
+          currentSort.direction
+        );
 
-        if (valueA < valueB) return direction === 'asc' ? -1 : 1;
-        if (valueA > valueB) return direction === 'asc' ? 1 : -1;
-        return 0;
+        if (primary !== 0) {
+          return primary;
+        }
+
+        if (currentSort.field === 'Authority') {
+          return compareValues(a.Name, b.Name, 'asc');
+        }
+
+        return compareValues(a.Authority, b.Authority, 'desc');
       });
 
       renderTable(filtered);
     }
 
+    headers.forEach(header => {
+      header.addEventListener('click', () => {
+        const field = header.dataset.sort;
+
+        if (currentSort.field === field) {
+          currentSort.direction = currentSort.direction === 'asc'
+            ? 'desc'
+            : 'asc';
+        } else {
+          currentSort.field = field;
+          currentSort.direction = field === 'Authority' ? 'desc' : 'asc';
+        }
+
+        applyFiltersAndSort();
+      });
+    });
+
+    searchInput.addEventListener('input', applyFiltersAndSort);
+
     Papa.parse(CSV_FILE, {
       download: true,
       header: true,
       skipEmptyLines: true,
-      complete: function(results) {
-        certifications = results.data;
+      complete: ({ data }) => {
+        certifications = data;
 
         status.style.display = 'none';
         tableWrapper.style.display = 'block';
 
         applyFiltersAndSort();
       },
-      error: function(err) {
-        status.innerHTML = `Failed to load CSV file: ${err.message}`;
+      error: error => {
+        status.textContent = `Failed to load CSV file: ${error.message}`;
       }
     });
-
-    sortField.addEventListener('change', applyFiltersAndSort);
-    sortDirection.addEventListener('change', applyFiltersAndSort);
-    searchInput.addEventListener('input', applyFiltersAndSort);
   </script></body>
 </html>
