@@ -18,11 +18,11 @@ body{margin:0;padding:24px;font:14px Arial,sans-serif;background:#f4f6f8;color:#
 </table>
 </div>
 <script>
-const P={Google:100,Microsoft:99,'Amazon Web Services (AWS)':98,AWS:98,Cisco:96,IBM:95,'EC-Council':94,Coursera:88,'TCM Security':86,Cybrary:85,'atingi.org':40},S=document.getElementById('s'),B=document.getElementById('b');
+const P={'University of Pennsylvania':120,'University of Maryland':119,'The Open University':118,Google:100,Microsoft:99,'Amazon Web Services (AWS)':98,AWS:98,Cisco:96,IBM:95,'EC-Council':94,Coursera:88,'TCM Security':86,Cybrary:85,'atingi.org':40},S=document.getElementById('s'),B=document.getElementById('b');
 let D=[],K='Authority',O='desc',I=1;
 const C=(a,b,o='asc')=>(a=(a||'').toLowerCase(),b=(b||'').toLowerCase(),a<b?o==='asc'?-1:1:a>b?o==='asc'?1:-1:0);
 const N=c=>{let i=(c.Authority||'').replace(' - Free online courses with Certificate','').trim(),n=(c.Name||'').replace(new RegExp('^'+i.replace(/[.*+?^${}()|[\]\]/g,'\$&')+'\s*[—-]\s*'),'').trim(),l=c['License Number']||'',u=c.Url||'';return u?`<a href="${u}" target="_blank" rel="noopener">${n}</a>`:l?`<a href="#" onclick="alert('${l.replace(/'/g,"\'")}');return false">${n}</a>`:n};
-function R(){let q=S.value.toLowerCase().trim(),F=D.filter(c=>(c.Authority||'').toLowerCase().includes(q)||(c.Name||'').toLowerCase().includes(q));
+function R(){let q=S.value.toLowerCase().trim(),F=D.filter(c=>(c.Url||c['License Number'])&&((c.Authority||'').toLowerCase().includes(q)||(c.Name||'').toLowerCase().includes(q)));
 F.sort((a,b)=>{if(I){let pa=P[a.Authority]||50,pb=P[b.Authority]||50;if(pa!==pb)return pb-pa}let r=C(a[K],b[K],O);return r||C(a[K==='Authority'?'Name':'Authority'],b[K==='Authority'?'Name':'Authority'],K==='Authority'?'asc':'desc')});
 I=0;
 B.innerHTML=F.length?F.map(c=>`<tr><td>${(c.Authority||'').replace(' - Free online courses with Certificate','')}</td><td>${N(c)}</td></tr>`).join(''):'<tr><td colspan="2" class="empty">No certificates found.</td></tr>'}
