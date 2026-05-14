@@ -336,11 +336,13 @@
       return ISSUER_WEIGHTS[issuerName] ?? 0;
     }
 
-    /* Sort: issuer weight DESC, then certificate name ASC */
+    /* Sort: issuer weight DESC, then issuer name ASC, then certificate name ASC */
     allRows.sort((a, b) => {
       const wA = issuerWeight(a['Issuer name']);
       const wB = issuerWeight(b['Issuer name']);
       if (wB !== wA) return wB - wA;
+      const iCmp = (a['Issuer name'] || '').localeCompare(b['Issuer name'] || '');
+      if (iCmp !== 0) return iCmp;
       return (a['Certificate name'] || '').localeCompare(b['Certificate name'] || '');
     });
 
