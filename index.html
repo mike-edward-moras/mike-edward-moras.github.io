@@ -172,17 +172,36 @@ headers.forEach(header=>{
 
 search.addEventListener('input',render);
 
-Papa.parse('./Certifications.csv',{
-  download:true,
-  header:true,
-  skipEmptyLines:true,
-  complete:results=>{
-    certificates=results.data||[];
-    render();
-  },
-  error:error=>{
-    tbody.innerHTML=`<tr><td colspan="2" class="empty">Failed to load CSV: ${error.message}</td></tr>`;
+async function loadCSV(){
+  const paths=['Certifications.csv','./Certifications.csv','/Certifications.csv'];
+
+  for(const path of paths){
+    try{
+      const response=await fetch(path,{cache:'no-store'});
+
+      if(!response.ok)continue;
+
+      const text=await response.text();
+
+      Papa.parse(text,{
+        header:true,
+        skipEmptyLines:true,
+        complete:results=>{
+          certificates=results.data||[];
+          render();
+        },
+        error:error=>{
+          tbody.innerHTML=`<tr><td colspan="2" class="empty">CSV parse error: ${error.message}</td></tr>`;
+        }
+      });
+
+      return;
+    }catch(e){}
   }
-});
+
+  tbody.innerHTML='<tr><td colspan="2" class="empty">Unable to load Certifications.csv</td></tr>';
+}
+
+loadCSV();
 </script></body>
 </html>
