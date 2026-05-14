@@ -136,11 +136,11 @@
               const url = cert.Url || '';
 
               if (license && url) {
-                return `<a href="${url}" target="_blank">${license}</a>`;
+                return `<a href="${url}" target="_blank">Verify</a>`;
               }
 
               if (license && !url) {
-                return license;
+                return `<a href="#" onclick="alert('${license.replace(/'/g, "\'")}'); return false;">Verify</a>`;
               }
 
               if (!license && url) {
