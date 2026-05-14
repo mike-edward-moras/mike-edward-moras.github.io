@@ -19,23 +19,32 @@ body{margin:0;padding:24px;font:14px Arial,sans-serif;background:#f4f6f8;color:#
 </table>
 </div>
 <script>
-const P={Google:100,Microsoft:99,'Amazon Web Services (AWS)':98,AWS:98,Cisco:96,IBM:95,'EC-Council':94,Coursera:88,'TCM Security':86,Cybrary:85,'atingi.org':40},S=document.getElementById('s'),B=document.getElementById('b');
-let D=[],K='Authority',O='desc',F=1;
-const X=t=>(t||'').replace(' - Free online courses with Certificate','').trim();
-const Y=(n,i)=>n.replace(new RegExp('^'+i.replace(/[.*+?^${}()|[\]\]/g,'\$&')+'\s*[—-]\s*'),'').trim();
-const C=(a,b,o)=>(a=(a||'').toLowerCase(),b=(b||'').toLowerCase(),a<b?o==='asc'?-1:1:a>b?o==='asc'?1:-1:0);
-const N=c=>{let i=X(c.Authority),n=Y(c.Name||'',i),l=c['License Number']||'',u=c.Url||'';return u?`<a href="${u}" target="_blank" rel="noopener">${n}</a>`:l?`<a href="#" onclick="alert('${l.replace(/'/g,"\'")}');return false">${n}</a>`:n};
-function R(){let q=S.value.toLowerCase().trim();
-let r=D.filter(c=>(c.Url||c['License Number'])&&((c.Authority||'').toLowerCase().includes(q)||(c.Name||'').toLowerCase().includes(q)));
-r.sort((a,b)=>{
-if(F){let pa=P[X(a.Authority)]||50,pb=P[X(b.Authority)]||50;if(pa!==pb)return pb-pa}
-let v=C(X(a[K]),X(b[K]),O);
-return v||C(a[K==='Authority'?'Name':'Authority'],b[K==='Authority'?'Name':'Authority'],K==='Authority'?'asc':'desc')});
+const P={Google:100,Microsoft:99,'Amazon Web Services (AWS)':98,AWS:98,Cisco:96,IBM:95,'EC-Council':94,Coursera:88,'TCM Security':86,Cybrary:85,'atingi.org':40};
+const S=document.getElementById('s'),B=document.getElementById('b');
+let D=[],K='Authority',O='desc',F=1;const X=t=>(t||'').replace(' - Free online courses with Certificate','').trim(); const E=s=>s.replace(/[.*+?^${}()|[]]/g,'$&'); const Y=(n,i)=>(n||'').replace(new RegExp(^${E(i)}\s*[—-]\s*),'').trim(); const C=(a,b,o='asc')=>((a=(a||'').toLowerCase())<(b=(b||'').toLowerCase())?o==='asc'?-1:1:a>b?o==='asc'?1:-1:0);
+
+const N=c=>{ const i=X(c.Authority),n=Y(c.Name,i),l=c['License Number']||'',u=c.Url||''; return u ? <a href="${u}" target="_blank" rel="noopener">${n}</a> : l ? <a href="#" onclick="alert('${l.replace(/'/g,"\'")}');return false">${n}</a> : n; };
+
+function R(){ const q=S.value.toLowerCase().trim();
+
+const r=D.filter(c=>(c.Url||c['License Number'])&&( (c.Authority||'').toLowerCase().includes(q)|| (c.Name||'').toLowerCase().includes(q) ));
+
+r.sort((a,b)=>{ if(F){ const pa=P[X(a.Authority)]||50,pb=P[X(b.Authority)]||50; if(pa!==pb)return pb-pa; }
+
+const v=C(X(a[K]),X(b[K]),O);
+return v||C(a[K==='Authority'?'Name':'Authority'],b[K==='Authority'?'Name':'Authority'],K==='Authority'?'asc':'desc');
+
+});
+
 F=0;
-B.innerHTML=r.length?r.map(c=>`<tr><td>${X(c.Authority)}</td><td>${N(c)}</td></tr>`).join(''):'<tr><td colspan="2" class="empty">No certificates found.</td></tr>'}
-Papa.parse('Certifications.csv',{download:1,header:1,skipEmptyLines:1,complete:x=>(D=x.data,R()),error:e=>B.innerHTML=`<tr><td colspan="2" class="empty">${e.message}</td></tr>`});
+
+B.innerHTML=r.length ? r.map(c=><tr><td>${X(c.Authority)}</td><td>${N(c)}</td></tr>).join('') : '<tr><td colspan="2" class="empty">No certificates found.</td></tr>'; }
+
+Papa.parse('Certifications.csv',{ download:true, header:true, skipEmptyLines:true, complete:r=>{D=r.data;R()}, error:e=>B.innerHTML=<tr><td colspan="2" class="empty">${e.message}</td></tr> });
+
 S.oninput=R;
-document.querySelectorAll('th').forEach(t=>t.onclick=()=>{K=t.dataset.k,O=K===t.dataset.k&&O==='asc'?'desc':'asc',F=0,R()});
-</script>
+
+document.querySelectorAll('th').forEach(t=>t.onclick=()=>{ K=t.dataset.k; O=O==='asc'?'desc':'asc'; F=0; R(); }); </script>
+
 </body>
 </html>
