@@ -273,6 +273,77 @@
     const res = await fetch('Certificates.csv?v=' + Date.now());
     const text = await res.text();
     allRows = parseCSV(text);
+
+    /* ── Issuer weights ──────────────────────────────────────────────
+       Scale 0–100. Higher = more employer-recognised.
+       Unknown / unlisted issuers fall back to 0 (neutral / lowest).
+    ──────────────────────────────────────────────────────────────── */
+    const ISSUER_WEIGHTS = {
+      // ── Tier 1 · Global tech & finance giants (85–95) ──
+      'Google':                            95,
+      'Microsoft':                         95,
+      'Goldman Sachs':                     92,
+      'IBM':                               88,
+      'Cisco':                             88,
+      'University of Pennsylvania':        85,
+
+      // ── Tier 2 · Major companies & prestigious institutions (75–84) ──
+      'Deloitte':                          82,
+      'Bloomberg':                         82,
+      'Mastercard':                        82,
+      'Accenture':                         80,
+      'Clifford Chance':                   80,
+      'Citi':                              80,
+      'Herbert Smith Freehills':           78,
+      'DLA Piper':                         76,
+      'Lloyds Banking Group':              75,
+      'Standard Chartered':               75,
+
+      // ── Tier 3 · Well-known companies, universities, govt (60–74) ──
+      'AIG':                               72,
+      'Anthropic':                         72,
+      'FEMA':                              72,
+      'University of Maryland':            70,
+      'Tata Group':                        70,
+      'PNC':                               70,
+      'The State University of New York':  65,
+      'EC-Council':                        65,
+      'UKAS':                              62,
+      'Dataiku':                           60,
+      'Leo Cussen Centre for Law':         60,
+      'Santander Open Academy':            60,
+
+      // ── Tier 4 · Online platforms with brand recognition (40–59) ──
+      'LinkedIn':                          58,
+      'Coursera':                          55,
+      'Datacom':                           52,
+      'The LEGO Foundation':              52,
+      'Cognitive Class':                   50,
+      'HP LIFE':                           50,
+      'Cybrary':                           48,
+      'FutureLearn':                       45,
+      'International Six Sigma Institute™': 45,
+      'Saylor University':                 42,
+      'atingi.org':                        42,
+
+      // ── Tier 5 · Lesser-known / self-cert platforms (20–39) ──
+      'SkillFront':                        35,
+      'Cursa':                             28,
+      'CourseStack, Inc':                  20,
+    };
+
+    function issuerWeight(issuerName) {
+      return ISSUER_WEIGHTS[issuerName] ?? 0;
+    }
+
+    /* Sort: issuer weight DESC, then certificate name ASC */
+    allRows.sort((a, b) => {
+      const wA = issuerWeight(a['Issuer name']);
+      const wB = issuerWeight(b['Issuer name']);
+      if (wB !== wA) return wB - wA;
+      return (a['Certificate name'] || '').localeCompare(b['Certificate name'] || '');
+    });
+
     render('');
   }
 
