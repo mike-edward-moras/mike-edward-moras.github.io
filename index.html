@@ -1,50 +1,188 @@
 <!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mike Edward Moras — Certificates</title>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <style>
-body{margin:0;padding:24px;font:14px Arial,sans-serif;background:#f4f6f8;color:#111}h1{margin:0}h2{margin:0 0 16px;font:400 18px Arial;color:#666}input{width:100%;padding:12px 14px;margin-bottom:16px;border:1px solid #ccc;border-radius:10px;font:inherit}table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.08)}th,td{padding:14px 16px;border-bottom:1px solid #eee;text-align:left}th{background:#111827;color:#fff;cursor:pointer;user-select:none}tr:hover{background:#f9fafb}a{color:#2563eb;text-decoration:none}a:hover{text-decoration:underline}.wrap{max-width:1100px;margin:auto}.empty{text-align:center;color:#777}
+body{margin:0;padding:24px;background:#f4f6f8;color:#111;font-family:Arial,sans-serif}
+.wrap{max-width:1100px;margin:auto}
+h1{margin:0;font-size:48px;font-weight:700}
+h2{margin:0 0 20px;color:#666;font-weight:400}
+input{width:100%;padding:14px 16px;margin-bottom:20px;border:1px solid #ccc;border-radius:12px;font-size:16px;box-sizing:border-box}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+th,td{padding:16px;text-align:left;border-bottom:1px solid #eee}
+th{background:#0f172a;color:#fff;cursor:pointer;user-select:none}
+tr:hover{background:#f8fafc}
+a{color:#2563eb;text-decoration:none}
+a:hover{text-decoration:underline}
+.empty{text-align:center;color:#666}
 </style>
 </head>
 <body>
 <div class="wrap">
 <h1>Mike Edward Moras</h1>
 <h2>Certificates</h2>
-<input id="s" placeholder="Search issuer or certificate name...">
+<input id="search" type="text" placeholder="Search issuer or certificate name...">
 <table>
-<thead><tr><th data-k="Authority">Issuer</th><th data-k="Name">Certificate Name</th></tr></thead>
-<tbody id="b"><tr><td colspan="2" class="empty">Loading...</td></tr></tbody>
+<thead>
+<tr>
+<th data-sort="Authority">Issuer</th>
+<th data-sort="Name">Certificate Name</th>
+</tr>
+</thead>
+<tbody id="tbody">
+<tr><td colspan="2" class="empty">Loading...</td></tr>
+</tbody>
 </table>
-</div>
-<script>
-const P={Google:100,Microsoft:99,'Amazon Web Services (AWS)':98,AWS:98,Cisco:96,IBM:95,'EC-Council':94,Coursera:88,'TCM Security':86,Cybrary:85,'atingi.org':40};
-const S=document.getElementById('s'),B=document.getElementById('b');
-let D=[],K='Authority',O='desc',F=1;const X=t=>(t||'').replace(' - Free online courses with Certificate','').trim(); const E=s=>s.replace(/[.*+?^${}()|[]]/g,'$&'); const Y=(n,i)=>(n||'').replace(new RegExp(^${E(i)}\s*[—-]\s*),'').trim(); const C=(a,b,o='asc')=>((a=(a||'').toLowerCase())<(b=(b||'').toLowerCase())?o==='asc'?-1:1:a>b?o==='asc'?1:-1:0);
+</div><script>
+const tbody=document.getElementById('tbody');
+const search=document.getElementById('search');
+const headers=document.querySelectorAll('th[data-sort]');
 
-const N=c=>{ const i=X(c.Authority),n=Y(c.Name,i),l=c['License Number']||'',u=c.Url||''; return u ? <a href="${u}" target="_blank" rel="noopener">${n}</a> : l ? <a href="#" onclick="alert('${l.replace(/'/g,"\'")}');return false">${n}</a> : n; };
+const issuerPriority={
+  Google:100,
+  Microsoft:99,
+  'Amazon Web Services (AWS)':98,
+  AWS:98,
+  Cisco:96,
+  IBM:95,
+  'EC-Council':94,
+  Coursera:88,
+  'TCM Security':86,
+  Cybrary:85,
+  'atingi.org':40
+};
 
-function R(){ const q=S.value.toLowerCase().trim();
+let certificates=[];
+let sortField='Authority';
+let sortDirection='desc';
+let firstLoad=true;
 
-const r=D.filter(c=>(c.Url||c['License Number'])&&( (c.Authority||'').toLowerCase().includes(q)|| (c.Name||'').toLowerCase().includes(q) ));
+function cleanIssuer(value=''){
+  return value
+    .replace(' - Free online courses with Certificate','')
+    .trim();
+}
 
-r.sort((a,b)=>{ if(F){ const pa=P[X(a.Authority)]||50,pb=P[X(b.Authority)]||50; if(pa!==pb)return pb-pa; }
+function escapeRegex(text=''){
+  return text.replace(/[.*+?^${}()|[\]\]/g,'\$&');
+}
 
-const v=C(X(a[K]),X(b[K]),O);
-return v||C(a[K==='Authority'?'Name':'Authority'],b[K==='Authority'?'Name':'Authority'],K==='Authority'?'asc':'desc');
+function cleanCertificateName(name='',issuer=''){
+  if(!issuer)return name;
 
+  const regex=new RegExp(`^${escapeRegex(issuer)}\s*[—-]\s*`,'i');
+  return name.replace(regex,'').trim();
+}
+
+function compare(a,b,direction='asc'){
+  const x=(a||'').toString().toLowerCase();
+  const y=(b||'').toString().toLowerCase();
+
+  if(x<y)return direction==='asc'?-1:1;
+  if(x>y)return direction==='asc'?1:-1;
+  return 0;
+}
+
+function certificateLink(cert){
+  const issuer=cleanIssuer(cert.Authority||'');
+  const name=cleanCertificateName(cert.Name||'',issuer);
+  const license=cert['License Number']||'';
+  const url=cert.Url||'';
+
+  if(url){
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer">${name}</a>`;
+  }
+
+  if(license){
+    const escaped=license.replace(/'/g,"\'");
+    return `<a href="#" onclick="alert('${escaped}');return false;">${name}</a>`;
+  }
+
+  return name;
+}
+
+function render(){
+  const q=search.value.trim().toLowerCase();
+
+  let rows=certificates.filter(cert=>{
+    const hasVerification=cert.Url||cert['License Number'];
+
+    if(!hasVerification)return false;
+
+    return (
+      (cert.Authority||'').toLowerCase().includes(q)||
+      (cert.Name||'').toLowerCase().includes(q)
+    );
+  });
+
+  rows.sort((a,b)=>{
+    if(firstLoad){
+      const pa=issuerPriority[cleanIssuer(a.Authority)]||50;
+      const pb=issuerPriority[cleanIssuer(b.Authority)]||50;
+
+      if(pa!==pb)return pb-pa;
+    }
+
+    const primary=compare(
+      cleanIssuer(a[sortField]),
+      cleanIssuer(b[sortField]),
+      sortDirection
+    );
+
+    if(primary!==0)return primary;
+
+    return compare(a.Name,b.Name,'asc');
+  });
+
+  firstLoad=false;
+
+  if(!rows.length){
+    tbody.innerHTML='<tr><td colspan="2" class="empty">No certificates found.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML=rows.map(cert=>{
+    const issuer=cleanIssuer(cert.Authority||'');
+
+    return `
+      <tr>
+        <td>${issuer}</td>
+        <td>${certificateLink(cert)}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+headers.forEach(header=>{
+  header.addEventListener('click',()=>{
+    const field=header.dataset.sort;
+
+    if(sortField===field){
+      sortDirection=sortDirection==='asc'?'desc':'asc';
+    }else{
+      sortField=field;
+      sortDirection=field==='Authority'?'desc':'asc';
+    }
+
+    render();
+  });
 });
 
-F=0;
+search.addEventListener('input',render);
 
-B.innerHTML=r.length ? r.map(c=><tr><td>${X(c.Authority)}</td><td>${N(c)}</td></tr>).join('') : '<tr><td colspan="2" class="empty">No certificates found.</td></tr>'; }
-
-Papa.parse('Certifications.csv',{ download:true, header:true, skipEmptyLines:true, complete:r=>{D=r.data;R()}, error:e=>B.innerHTML=<tr><td colspan="2" class="empty">${e.message}</td></tr> });
-
-S.oninput=R;
-
-document.querySelectorAll('th').forEach(t=>t.onclick=()=>{ K=t.dataset.k; O=O==='asc'?'desc':'asc'; F=0; R(); }); </script>
-
-</body>
+Papa.parse('./Certifications.csv',{
+  download:true,
+  header:true,
+  skipEmptyLines:true,
+  complete:results=>{
+    certificates=results.data||[];
+    render();
+  },
+  error:error=>{
+    tbody.innerHTML=`<tr><td colspan="2" class="empty">Failed to load CSV: ${error.message}</td></tr>`;
+  }
+});
+</script></body>
 </html>
