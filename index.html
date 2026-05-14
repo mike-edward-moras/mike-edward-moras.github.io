@@ -1,261 +1,34 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Certification Viewer</title>  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      padding: 24px;
-      font-family: Arial, sans-serif;
-      background: #f4f6f8;
-      color: #1f2937;
-    }
-
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    h1 {
-      margin: 0 0 20px;
-      font-size: 28px;
-    }
-
-    .toolbar {
-      margin-bottom: 18px;
-    }
-
-    .search {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1px solid #d1d5db;
-      border-radius: 10px;
-      font-size: 14px;
-      outline: none;
-    }
-
-    .search:focus {
-      border-color: #2563eb;
-    }
-
-    .table-wrapper {
-      overflow-x: auto;
-      background: #fff;
-      border-radius: 14px;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    thead {
-      background: #111827;
-      color: white;
-    }
-
-    th,
-    td {
-      padding: 14px 16px;
-      text-align: left;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    th {
-      cursor: pointer;
-      user-select: none;
-      white-space: nowrap;
-    }
-
-    tbody tr:hover {
-      background: #f9fafb;
-    }
-
-    a {
-      color: #2563eb;
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-
-    .status {
-      padding: 20px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-    }
-
-    .empty {
-      text-align: center;
-      color: #6b7280;
-    }
-  </style></head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mike Edward Moras — Certificates</title>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<style>
+body{margin:0;padding:24px;font:14px Arial,sans-serif;background:#f4f6f8;color:#111}h1{margin:0 0 16px}input{width:100%;padding:12px 14px;margin-bottom:16px;border:1px solid #ccc;border-radius:10px}table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.08)}th,td{padding:14px 16px;border-bottom:1px solid #eee;text-align:left}th{background:#111827;color:#fff;cursor:pointer;user-select:none}tr:hover{background:#f9fafb}a{color:#2563eb;text-decoration:none}a:hover{text-decoration:underline}.wrap{max-width:1100px;margin:auto}.empty{text-align:center;color:#777}
+</style>
+</head>
 <body>
-  <div class="container">
-    <h1>Certification Viewer</h1><div class="toolbar">
-  <input
-    type="text"
-    id="searchInput"
-    class="search"
-    placeholder="Search issuer or certificate name..."
-  />
+<div class="wrap">
+<h1>Mike Edward Moras</h1><h2 style="margin:0 0 16px;font-weight:400;color:#555">Certificates</h2>
+<input id="s" placeholder="Search issuer or certificate name...">
+<table>
+<thead><tr><th data-k="Authority">Issuer</th><th data-k="Name">Certificate Name</th></tr></thead>
+<tbody id="b"><tr><td colspan="2" class="empty">Loading...</td></tr></tbody>
+</table>
 </div>
-
-<div id="status" class="status">Loading certifications...</div>
-
-<div id="tableWrapper" class="table-wrapper" style="display:none;">
-  <table>
-    <thead>
-      <tr>
-        <th data-sort="Authority">Issuer</th>
-        <th data-sort="Name">Certificate Name</th>
-      </tr>
-    </thead>
-    <tbody id="tableBody"></tbody>
-  </table>
-</div>
-
-  </div>  <script>
-    const CSV_FILE = 'Certifications.csv';
-
-    const tableBody = document.getElementById('tableBody');
-    const searchInput = document.getElementById('searchInput');
-    const tableWrapper = document.getElementById('tableWrapper');
-    const status = document.getElementById('status');
-    const headers = document.querySelectorAll('th[data-sort]');
-
-    let certifications = [];
-
-    let currentSort = {
-      field: 'Authority',
-      direction: 'desc'
-    };
-
-    function compareValues(a, b, direction = 'asc') {
-      const valueA = (a || '').toString().toLowerCase();
-      const valueB = (b || '').toString().toLowerCase();
-
-      if (valueA < valueB) return direction === 'asc' ? -1 : 1;
-      if (valueA > valueB) return direction === 'asc' ? 1 : -1;
-      return 0;
-    }
-
-    function getCertificateName(cert) {
-      const name = cert.Name || 'Untitled';
-      const license = cert['License Number'] || '';
-      const url = cert.Url || '';
-
-      if (url) {
-        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${name}</a>`;
-      }
-
-      if (license) {
-        const escapedLicense = license.replace(/'/g, "\'");
-
-        return `
-          <a
-            href="#"
-            onclick="alert('${escapedLicense}'); return false;"
-          >
-            ${name}
-          </a>
-        `;
-      }
-
-      return name;
-    }
-
-    function renderTable(data) {
-      if (!data.length) {
-        tableBody.innerHTML = `
-          <tr>
-            <td colspan="2" class="empty">No certificates found.</td>
-          </tr>
-        `;
-        return;
-      }
-
-      tableBody.innerHTML = data.map(cert => `
-        <tr>
-          <td>${cert.Authority || ''}</td>
-          <td>${getCertificateName(cert)}</td>
-        </tr>
-      `).join('');
-    }
-
-    function applyFiltersAndSort() {
-      const search = searchInput.value.trim().toLowerCase();
-
-      let filtered = certifications.filter(cert => {
-        return (
-          (cert.Authority || '').toLowerCase().includes(search) ||
-          (cert.Name || '').toLowerCase().includes(search)
-        );
-      });
-
-      filtered.sort((a, b) => {
-        const primary = compareValues(
-          a[currentSort.field],
-          b[currentSort.field],
-          currentSort.direction
-        );
-
-        if (primary !== 0) {
-          return primary;
-        }
-
-        if (currentSort.field === 'Authority') {
-          return compareValues(a.Name, b.Name, 'asc');
-        }
-
-        return compareValues(a.Authority, b.Authority, 'desc');
-      });
-
-      renderTable(filtered);
-    }
-
-    headers.forEach(header => {
-      header.addEventListener('click', () => {
-        const field = header.dataset.sort;
-
-        if (currentSort.field === field) {
-          currentSort.direction = currentSort.direction === 'asc'
-            ? 'desc'
-            : 'asc';
-        } else {
-          currentSort.field = field;
-          currentSort.direction = field === 'Authority' ? 'desc' : 'asc';
-        }
-
-        applyFiltersAndSort();
-      });
-    });
-
-    searchInput.addEventListener('input', applyFiltersAndSort);
-
-    Papa.parse(CSV_FILE, {
-      download: true,
-      header: true,
-      skipEmptyLines: true,
-      complete: ({ data }) => {
-        certifications = data;
-
-        status.style.display = 'none';
-        tableWrapper.style.display = 'block';
-
-        applyFiltersAndSort();
-      },
-      error: error => {
-        status.textContent = `Failed to load CSV file: ${error.message}`;
-      }
-    });
-  </script></body>
+<script>
+const P={Google:100,Microsoft:99,'Amazon Web Services (AWS)':98,AWS:98,Cisco:96,IBM:95,'EC-Council':94,Coursera:88,'TCM Security':86,Cybrary:85,'atingi.org':40},S=document.getElementById('s'),B=document.getElementById('b');
+let D=[],K='Authority',O='desc',I=1;
+const C=(a,b,o='asc')=>(a=(a||'').toLowerCase(),b=(b||'').toLowerCase(),a<b?o==='asc'?-1:1:a>b?o==='asc'?1:-1:0);
+const N=c=>{let n=c.Name||'',l=c['License Number']||'',u=c.Url||'';return u?`<a href="${u}" target="_blank" rel="noopener">${n}</a>`:l?`<a href="#" onclick="alert('${l.replace(/'/g,"\'")}');return false">${n}</a>`:n};
+function R(){let q=S.value.toLowerCase().trim(),F=D.filter(c=>(c.Authority||'').toLowerCase().includes(q)||(c.Name||'').toLowerCase().includes(q));
+F.sort((a,b)=>{if(I){let pa=P[a.Authority]||50,pb=P[b.Authority]||50;if(pa!==pb)return pb-pa}let r=C(a[K],b[K],O);return r||C(a[K==='Authority'?'Name':'Authority'],b[K==='Authority'?'Name':'Authority'],K==='Authority'?'asc':'desc')});
+I=0;
+B.innerHTML=F.length?F.map(c=>`<tr><td>${c.Authority||''}</td><td>${N(c)}</td></tr>`).join(''):'<tr><td colspan="2" class="empty">No certificates found.</td></tr>'}
+Papa.parse('Certifications.csv',{download:1,header:1,skipEmptyLines:1,complete:r=>(D=r.data,R()),error:e=>B.innerHTML=`<tr><td colspan="2" class="empty">${e.message}</td></tr>`});
+S.oninput=R;
+document.querySelectorAll('th').forEach(t=>t.onclick=()=>{K=t.dataset.k,O=O==='asc'?'desc':'asc',I=0,R()});
+</script>
+</body>
 </html>
