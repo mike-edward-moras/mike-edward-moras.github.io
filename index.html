@@ -83,7 +83,7 @@
   </thead>
   <tbody id="tableBody">
     <tr>
-      <td colspan="2" class="message">Loading certificates...</td>
+      <td colspan="2" class="message">Initializing...</td>
     </tr>
   </tbody>
 </table>
@@ -226,56 +226,81 @@
       }).join('');
     }
 
+    function showMessage(message,popup=false){
+      tableBody.innerHTML=`
+        <tr>
+          <td colspan="2" class="message">${message}</td>
+        </tr>
+      `;
+
+      if(popup){
+        alert(message);
+      }
+    }</td>
+        </tr>
+      `;
+    }
+
     async function loadCertificates(){
       try{
-        const response=await fetch('Certifications.csv?cache='+Date.now());
+        showMessage('Starting CSV request...',true);
+
+        const url='Certifications.csv?cache='+Date.now();
+        console.log('Fetching CSV:',url);
+
+        const response=await fetch(url);
+
+        console.log('Fetch response:',response.status,response.statusText);
 
         if(!response.ok){
-          throw new Error(`HTTP ${response.status}`);
+          throw new Error(`HTTP ${response.status} ${response.statusText}`);
         }
 
+        showMessage('CSV file downloaded. Reading contents...',true);
+
         const csvText=await response.text();
+
+        console.log('CSV length:',csvText.length);
+
+        if(!csvText.trim()){
+          throw new Error('CSV file is empty');
+        }
+
+        showMessage('Parsing CSV data...',true);
 
         Papa.parse(csvText,{
           header:true,
           skipEmptyLines:true,
           complete:(results)=>{
+            console.log('Parsed rows:',results.data?.length||0);
+            console.log('Parse errors:',results.errors);
+
+            if(results.errors && results.errors.length){
+              showMessage('CSV parse errors detected.',true);
+              return;
+            }
+
             certificates=results.data||[];
+
+            if(!certificates.length){
+              showMessage('CSV loaded but contains no rows.',true);
+              return;
+            }
+
+            showMessage(`Loaded ${certificates.length} certificates. Rendering...`,true);
+
             render();
           },
           error:(error)=>{
-            tableBody.innerHTML=`
-              <tr>
-                <td colspan="2" class="message">CSV parsing failed: ${error.message}</td>
-              </tr>
-            `;
+            console.error('PapaParse error:',error);
+            showMessage(`CSV parsing failed: ${error.message}`,true);
           }
         });
       }catch(error){
-        tableBody.innerHTML=`
-          <tr>
-            <td colspan="2" class="message">Failed to load Certifications.csv (${error.message})</td>
-          </tr>
-        `;
+        console.error('Load failure:',error);
+        showMessage(`Failed to load Certifications.csv (${error.message})`,true);
       }
     }
-
-    searchInput.addEventListener('input',render);
-
-    headers.forEach(header=>{
-      header.addEventListener('click',()=>{
-        const field=header.dataset.field;
-
-        if(sortField===field){
-          sortDirection=sortDirection==='asc'?'desc':'asc';
-        }else{
-          sortField=field;
-          sortDirection=field==='issuer'?'desc':'asc';
-        }
-
-        render();
-      });
-    });
 
     loadCertificates();
   </script></body>
