@@ -4,428 +4,190 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Certifications Viewer</title>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg: #f4f3ef;
-      --surface: #ffffff;
-      --border: #d8d5cc;
-      --border-strong: #b0aca0;
-      --text: #1a1917;
-      --text-muted: #6b6760;
-      --accent: #1a4a8a;
-      --accent-light: #e8eef7;
-      --sort-active: #0d3168;
-      --row-hover: #f9f8f5;
-      --stripe: #faf9f6;
-      --link: #1a4a8a;
-      --link-hover: #0d3168;
-      --search-focus: #1a4a8a;
-    }
-
     body {
-      font-family: 'IBM Plex Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      padding: 40px 32px;
-    }
-
-    header {
-      margin-bottom: 32px;
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f5f5f5;
     }
 
     h1 {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 22px;
-      font-weight: 600;
-      letter-spacing: -0.3px;
-      color: var(--text);
-    }
-
-    h1 span {
-      color: var(--accent);
-    }
-
-    .subtitle {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-top: 4px;
-      font-weight: 300;
-    }
-
-    /* Search */
-    .controls {
       margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
     }
 
-    .search-wrap {
-      position: relative;
-      width: 320px;
+    .controls {
+      margin-bottom: 15px;
     }
 
-    .search-wrap svg {
-      position: absolute;
-      left: 11px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-      pointer-events: none;
-    }
-
-    #searchInput {
-      width: 100%;
-      padding: 9px 12px 9px 36px;
-      font-family: 'IBM Plex Sans', sans-serif;
+    select {
+      padding: 8px;
       font-size: 14px;
-      border: 1.5px solid var(--border);
-      background: var(--surface);
-      color: var(--text);
-      outline: none;
-      transition: border-color 0.15s;
-    }
-
-    #searchInput:focus {
-      border-color: var(--search-focus);
-    }
-
-    #searchInput::placeholder {
-      color: var(--text-muted);
-    }
-
-    .result-count {
-      font-size: 13px;
-      color: var(--text-muted);
-      font-family: 'IBM Plex Mono', monospace;
-    }
-
-    /* Table */
-    .table-wrap {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      overflow: hidden;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
+      background: white;
     }
 
-    thead tr {
-      border-bottom: 2px solid var(--border-strong);
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
     }
 
     th {
-      background: var(--surface);
-      padding: 12px 14px;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.6px;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      text-align: left;
-      vertical-align: middle;
-      white-space: nowrap;
-      user-select: none;
-      border-right: 1px solid var(--border);
+      background: #f0f0f0;
     }
 
-    th:last-child {
-      border-right: none;
-    }
-
-    th.sortable {
-      cursor: pointer;
-      transition: background 0.12s, color 0.12s;
-    }
-
-    th.sortable:hover {
-      background: var(--accent-light);
-      color: var(--accent);
-    }
-
-    th.sort-active {
-      background: var(--accent-light);
-      color: var(--sort-active);
-    }
-
-    .th-inner {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .sort-icon {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5px;
-      flex-shrink: 0;
-    }
-
-    .sort-icon span {
-      display: block;
-      width: 0;
-      height: 0;
-      border-left: 4px solid transparent;
-      border-right: 4px solid transparent;
-      opacity: 0.25;
-      transition: opacity 0.12s;
-    }
-
-    .sort-icon .arrow-up {
-      border-bottom: 5px solid currentColor;
-    }
-
-    .sort-icon .arrow-down {
-      border-top: 5px solid currentColor;
-    }
-
-    th.sort-active.asc .sort-icon .arrow-up  { opacity: 1; }
-    th.sort-active.desc .sort-icon .arrow-down { opacity: 1; }
-    th.sortable:not(.sort-active):hover .sort-icon span { opacity: 0.45; }
-
-    td {
-      padding: 11px 14px;
-      font-size: 14px;
-      vertical-align: top;
-      border-right: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-
-    td:last-child { border-right: none; }
-
-    tr:last-child td { border-bottom: none; }
-
-    tbody tr:nth-child(even) td {
-      background: var(--stripe);
-    }
-
-    tbody tr:hover td {
-      background: var(--row-hover);
+    tr:nth-child(even) {
+      background: #fafafa;
     }
 
     a {
-      color: var(--link);
+      color: #0066cc;
       text-decoration: none;
-      font-size: 13px;
-      font-family: 'IBM Plex Mono', monospace;
     }
 
     a:hover {
-      color: var(--link-hover);
       text-decoration: underline;
-    }
-
-    .no-results {
-      padding: 40px;
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 14px;
-    }
-
-    .highlight {
-      background: #fff3b0;
-      border-radius: 2px;
     }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>Certifications <span>//</span></h1>
-  <p class="subtitle">Click a column header to sort · Type to search</p>
-</header>
+<h1>Certifications</h1>
 
 <div class="controls">
-  <div class="search-wrap">
-    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M10 6.5C10 8.433 8.433 10 6.5 10C4.567 10 3 8.433 3 6.5C3 4.567 4.567 3 6.5 3C8.433 3 10 4.567 10 6.5ZM9.31 10.02A5.5 5.5 0 1 1 10.02 9.31L13.35 12.65L12.65 13.35L9.31 10.02Z" fill="currentColor"/>
-    </svg>
-    <input type="text" id="searchInput" placeholder="Search certificates…" autocomplete="off" spellcheck="false">
-  </div>
-  <span class="result-count" id="resultCount"></span>
+  <label for="sortSelect">Sort by:</label>
+  <select id="sortSelect">
+    <option value="issuer">Issuer Name</option>
+    <option value="certificate">Certificate Name</option>
+  </select>
 </div>
 
-<div class="table-wrap">
-  <table id="certTable">
-    <thead>
-      <tr>
-        <th class="sortable" id="thIssuer" onclick="sortBy('issuer')">
-          <div class="th-inner">
-            Issuer Name
-            <span class="sort-icon">
-              <span class="arrow-up"></span>
-              <span class="arrow-down"></span>
-            </span>
-          </div>
-        </th>
-        <th class="sortable" id="thCert" onclick="sortBy('cert')">
-          <div class="th-inner">
-            Certificate Name
-            <span class="sort-icon">
-              <span class="arrow-up"></span>
-              <span class="arrow-down"></span>
-            </span>
-          </div>
-        </th>
-        <th>Verification</th>
-      </tr>
-    </thead>
-    <tbody id="certTbody"></tbody>
-  </table>
-</div>
+<table id="certTable">
+  <thead>
+    <tr>
+      <th>Issuer Name</th>
+      <th>Certificate Name</th>
+      <th>Verification</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
 
 <script>
-  let allRows = [];
-  let sortKey = null;       // 'issuer' | 'cert' | null
-  let sortDir = 'asc';      // 'asc' | 'desc'
-  let searchQuery = '';
+async function loadCSV() {
+  const response = await fetch('Certificates.csv?v=' + Date.now());
+  const csvText = await response.text();
 
-  /* ── CSV loading ── */
-  async function loadCSV() {
-    const response = await fetch('Certificates.csv');
-    const csvText = await response.text();
-    allRows = parseCSV(csvText);
-    render();
-  }
+  const rows = parseCSV(csvText);
 
-  function parseCSV(text) {
-    const lines = text.trim().split('\n');
-    const headers = parseCSVLine(lines[0]);
-    return lines.slice(1).map(line => {
-      const values = parseCSVLine(line);
-      const obj = {};
-      headers.forEach((h, i) => obj[h] = values[i] || '');
-      return obj;
-    });
-  }
+  renderTable(rows);
 
-  function parseCSVLine(line) {
-    const result = [];
-    let current = '';
-    let insideQuotes = false;
-    for (let i = 0; i < line.length; i++) {
-      const char = line[i];
-      if (char === '"') {
-        if (insideQuotes && line[i + 1] === '"') { current += '"'; i++; }
-        else { insideQuotes = !insideQuotes; }
-      } else if (char === ',' && !insideQuotes) {
-        result.push(current); current = '';
-      } else {
-        current += char;
-      }
-    }
-    result.push(current);
-    return result;
-  }
+  document.getElementById('sortSelect').addEventListener('change', (e) => {
+    const sorted = [...rows];
 
-  /* ── Sort ── */
-  function sortBy(key) {
-    if (sortKey === key) {
-      sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+    if (e.target.value === 'issuer') {
+      sorted.sort((a, b) =>
+        a["Issuer name"].localeCompare(b["Issuer name"])
+      );
     } else {
-      sortKey = key;
-      sortDir = 'asc';
+      sorted.sort((a, b) =>
+        a["Certificate name"].localeCompare(b["Certificate name"])
+      );
     }
-    updateSortHeaders();
-    render();
-  }
 
-  function updateSortHeaders() {
-    const thIssuer = document.getElementById('thIssuer');
-    const thCert   = document.getElementById('thCert');
-
-    thIssuer.className = 'sortable';
-    thCert.className   = 'sortable';
-
-    if (sortKey === 'issuer') { thIssuer.className = `sortable sort-active ${sortDir}`; }
-    if (sortKey === 'cert')   { thCert.className   = `sortable sort-active ${sortDir}`; }
-  }
-
-  function getSorted(rows) {
-    if (!sortKey) return rows;
-    return [...rows].sort((a, b) => {
-      const field = sortKey === 'issuer' ? 'Issuer name' : 'Certificate name';
-      const cmp = (a[field] || '').localeCompare(b[field] || '');
-      return sortDir === 'asc' ? cmp : -cmp;
-    });
-  }
-
-  /* ── Search ── */
-  document.getElementById('searchInput').addEventListener('input', (e) => {
-    searchQuery = e.target.value.trim().toLowerCase();
-    render();
+    renderTable(sorted);
   });
+}
 
-  function getFiltered(rows) {
-    if (!searchQuery) return rows;
-    return rows.filter(row =>
-      (row['Issuer name'] || '').toLowerCase().includes(searchQuery) ||
-      (row['Certificate name'] || '').toLowerCase().includes(searchQuery) ||
-      (row['Verification'] || '').toLowerCase().includes(searchQuery)
-    );
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const headers = parseCSVLine(lines[0]);
+
+  return lines.slice(1).map(line => {
+    const values = parseCSVLine(line);
+    const obj = {};
+
+    headers.forEach((header, index) => {
+      obj[header] = values[index] || '';
+    });
+
+    return obj;
+  });
+}
+
+function parseCSVLine(line) {
+  const result = [];
+  let current = '';
+  let insideQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+
+    if (char === '"') {
+      if (insideQuotes && line[i + 1] === '"') {
+        current += '"';
+        i++;
+      } else {
+        insideQuotes = !insideQuotes;
+      }
+    } else if (char === ',' && !insideQuotes) {
+      result.push(current);
+      current = '';
+    } else {
+      current += char;
+    }
   }
 
-  /* ── Highlight match ── */
-  function highlight(text, query) {
-    if (!query) return escapeHtml(text);
-    const escaped = escapeHtml(text);
-    const escapedQ = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    return escaped.replace(new RegExp(`(${escapedQ})`, 'gi'),
-      '<mark class="highlight">$1</mark>');
-  }
+  result.push(current);
 
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
+  return result;
+}
 
-  /* ── Render ── */
-  function render() {
-    const filtered = getFiltered(allRows);
-    const sorted   = getSorted(filtered);
+function renderTable(rows) {
+  const tbody = document.querySelector('#certTable tbody');
+  tbody.innerHTML = '';
 
-    const tbody = document.getElementById('certTbody');
-    const countEl = document.getElementById('resultCount');
+  rows.forEach(row => {
+    const tr = document.createElement('tr');
 
-    countEl.textContent = searchQuery
-      ? `${sorted.length} of ${allRows.length} results`
-      : `${allRows.length} entries`;
+    const issuerTd = document.createElement('td');
+    issuerTd.textContent = row["Issuer name"] || '';
 
-    if (sorted.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="3" class="no-results">No certificates match your search.</td></tr>`;
-      return;
+    const certTd = document.createElement('td');
+    certTd.textContent = row["Certificate name"] || '';
+
+    const verificationTd = document.createElement('td');
+
+    const verification = row["Verification"] || '';
+    const verificationUrl = row["Verification URL"] || '';
+
+    if (verification && verificationUrl) {
+      const link = document.createElement('a');
+      link.href = verificationUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = verification;
+
+      verificationTd.appendChild(link);
+    } else if (verification) {
+      verificationTd.textContent = verification;
     }
 
-    tbody.innerHTML = sorted.map(row => {
-      const verification    = row['Verification'] || '';
-      const verificationUrl = row['Verification URL'] || '';
+    tr.appendChild(issuerTd);
+    tr.appendChild(certTd);
+    tr.appendChild(verificationTd);
 
-      let verCell = '';
-      if (verification && verificationUrl) {
-        verCell = `<a href="${escapeHtml(verificationUrl)}" target="_blank" rel="noopener noreferrer">${highlight(verification, searchQuery)}</a>`;
-      } else if (verification) {
-        verCell = highlight(verification, searchQuery);
-      }
+    tbody.appendChild(tr);
+  });
+}
 
-      return `<tr>
-        <td>${highlight(row['Issuer name'] || '', searchQuery)}</td>
-        <td>${highlight(row['Certificate name'] || '', searchQuery)}</td>
-        <td>${verCell}</td>
-      </tr>`;
-    }).join('');
-  }
-
-  loadCSV();
+loadCSV();
 </script>
 
 </body>
