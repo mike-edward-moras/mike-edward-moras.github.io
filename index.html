@@ -90,8 +90,8 @@
     <table>
       <thead>
         <tr>
-          <th>Certificate Name</th>
           <th>Issuer</th>
+          <th>Certificate Name</th>
           <th>Year</th>
           <th>Verification</th>
         </tr>
@@ -127,8 +127,8 @@
         const row = document.createElement('tr');
 
         row.innerHTML = `
-          <td>${cert.Name || ''}</td>
           <td>${cert.Authority || ''}</td>
+          <td>${cert.Name || ''}</td>
           <td>${(cert['Started On'] || '').toString().match(/\d{4}/)?.[0] || ''}</td>
           <td>
             ${(() => {
@@ -140,7 +140,7 @@
               }
 
               if (license && !url) {
-                return `<a href="#" onclick="alert('${license.replace(/'/g, "\'")}'); return false;">Verify</a>`;
+                return `<a href="#" onclick="alert('${license.replace(/'/g, "\'")}'); return false;">Certificate ID</a>`;
               }
 
               if (!license && url) {
@@ -157,6 +157,21 @@
     }
 
     function applyFiltersAndSort() {
+      certifications.sort((a, b) => {
+        const issuerA = (a.Authority || '').toLowerCase();
+        const issuerB = (b.Authority || '').toLowerCase();
+
+        if (issuerA < issuerB) return 1;
+        if (issuerA > issuerB) return -1;
+
+        const nameA = (a.Name || '').toLowerCase();
+        const nameB = (b.Name || '').toLowerCase();
+
+        if (nameA < nameB) return -1;
+        if (nameA > nameB) return 1;
+
+        return 0;
+      });
       const field = sortField.value;
       const direction = sortDirection.value;
       const search = searchInput.value.toLowerCase().trim();
