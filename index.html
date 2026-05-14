@@ -3,191 +3,361 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Certifications Viewer</title>
+  <title>Certifications</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f0f0f;
+      --surface:   #181818;
+      --surface2:  #202020;
+      --border:    #2a2a2a;
+      --border2:   #333;
+      --text:      #e8e4dc;
+      --muted:     #706b60;
+      --accent:    #c9a96e;
+      --accent-dim:#7a5f32;
+      --link:      #c9a96e;
+      --link-hover:#e0c08a;
+      --mark-bg:   rgba(201,169,110,0.22);
+      --mark-text: #e0c08a;
+    }
+
+    html { scroll-behavior: smooth; }
+
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background: #f5f5f5;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 56px 40px 80px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* ── Header ── */
+    header {
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp 0.6s ease forwards;
+    }
+
+    .eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
     }
 
     h1 {
-      margin-bottom: 20px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(36px, 6vw, 56px);
+      font-weight: 600;
+      line-height: 1.05;
+      letter-spacing: -0.5px;
+      color: var(--text);
     }
 
-    .controls {
-      margin-bottom: 15px;
+    .header-rule {
+      margin-top: 20px;
+      height: 1px;
+      background: linear-gradient(to right, var(--accent-dim), transparent);
     }
 
-    select {
-      padding: 8px;
-      font-size: 14px;
+    /* ── Search ── */
+    .search-bar {
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.1s ease forwards;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
+    .search-inner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      padding: 0 16px;
+      transition: border-color 0.2s;
     }
 
-    th, td {
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: left;
-      vertical-align: top;
+    .search-inner:focus-within {
+      border-color: var(--accent-dim);
     }
 
-    th {
-      background: #f0f0f0;
+    .search-icon {
+      color: var(--muted);
+      flex-shrink: 0;
     }
 
-    tr:nth-child(even) {
-      background: #fafafa;
+    #searchInput {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--text);
+      padding: 14px 0;
+      caret-color: var(--accent);
     }
 
-    a {
-      color: #0066cc;
+    #searchInput::placeholder { color: var(--muted); }
+
+    .result-count {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ── Cards ── */
+    #cardList {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.2s ease forwards;
+    }
+
+    .cert-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 20px 24px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-rows: auto auto;
+      column-gap: 24px;
+      row-gap: 6px;
+      align-items: center;
+      transition: background 0.15s, border-color 0.15s;
+      animation: fadeIn 0.3s ease both;
+    }
+
+    .cert-card:hover {
+      background: var(--surface2);
+      border-color: var(--border2);
+    }
+
+    .cert-name {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.3;
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .cert-issuer {
+      font-size: 13px;
+      font-weight: 300;
+      color: var(--muted);
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    .cert-verify {
+      grid-column: 2;
+      grid-row: 1 / 3;
+      align-self: center;
+      justify-self: end;
+    }
+
+    .verify-link {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--accent);
       text-decoration: none;
+      border: 1px solid var(--accent-dim);
+      padding: 5px 12px;
+      white-space: nowrap;
+      transition: background 0.15s, color 0.15s;
     }
 
-    a:hover {
-      text-decoration: underline;
+    .verify-link:hover {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .verify-text {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* highlight */
+    mark {
+      background: var(--mark-bg);
+      color: var(--mark-text);
+      border-radius: 2px;
+      padding: 0 1px;
+    }
+
+    /* ── Empty / loading states ── */
+    .state-msg {
+      padding: 60px 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 300;
+      letter-spacing: 0.3px;
+    }
+
+    .state-msg span {
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 28px;
+      color: var(--border2);
+      margin-bottom: 12px;
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
     }
   </style>
 </head>
 <body>
 
-<h1>Certifications</h1>
+  <header>
+    <p class="eyebrow">Professional Record</p>
+    <h1>Certifications</h1>
+    <div class="header-rule"></div>
+  </header>
 
-<div class="controls">
-  <label for="sortSelect">Sort by:</label>
-  <select id="sortSelect">
-    <option value="issuer">Issuer Name</option>
-    <option value="certificate">Certificate Name</option>
-  </select>
-</div>
+  <div class="search-bar">
+    <div class="search-inner">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.4"/>
+        <line x1="10.5" y1="10.5" x2="14" y2="14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <input type="text" id="searchInput" placeholder="Search by issuer or certificate…" autocomplete="off" spellcheck="false">
+      <span class="result-count" id="resultCount"></span>
+    </div>
+  </div>
 
-<table id="certTable">
-  <thead>
-    <tr>
-      <th>Issuer Name</th>
-      <th>Certificate Name</th>
-      <th>Verification</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
+  <div id="cardList">
+    <div class="state-msg"><span>·</span>Loading…</div>
+  </div>
 
 <script>
-async function loadCSV() {
-  const response = await fetch('Certificates.csv?v=' + Date.now());
-  const csvText = await response.text();
+  let allRows = [];
 
-  const rows = parseCSV(csvText);
-
-  renderTable(rows);
-
-  document.getElementById('sortSelect').addEventListener('change', (e) => {
-    const sorted = [...rows];
-
-    if (e.target.value === 'issuer') {
-      sorted.sort((a, b) =>
-        a["Issuer name"].localeCompare(b["Issuer name"])
-      );
-    } else {
-      sorted.sort((a, b) =>
-        a["Certificate name"].localeCompare(b["Certificate name"])
-      );
-    }
-
-    renderTable(sorted);
-  });
-}
-
-function parseCSV(text) {
-  const lines = text.trim().split('\n');
-  const headers = parseCSVLine(lines[0]);
-
-  return lines.slice(1).map(line => {
-    const values = parseCSVLine(line);
-    const obj = {};
-
-    headers.forEach((header, index) => {
-      obj[header] = values[index] || '';
-    });
-
-    return obj;
-  });
-}
-
-function parseCSVLine(line) {
-  const result = [];
-  let current = '';
-  let insideQuotes = false;
-
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-
-    if (char === '"') {
-      if (insideQuotes && line[i + 1] === '"') {
-        current += '"';
-        i++;
-      } else {
-        insideQuotes = !insideQuotes;
-      }
-    } else if (char === ',' && !insideQuotes) {
-      result.push(current);
-      current = '';
-    } else {
-      current += char;
-    }
+  /* ── Fetch ── */
+  async function loadCSV() {
+    const res = await fetch('Certificates.csv?v=' + Date.now());
+    const text = await res.text();
+    allRows = parseCSV(text);
+    render('');
   }
 
-  result.push(current);
+  /* ── CSV parsing ── */
+  function parseCSV(text) {
+    const lines = text.trim().split('\n');
+    const headers = parseCSVLine(lines[0]);
+    return lines.slice(1).map(line => {
+      const values = parseCSVLine(line);
+      const obj = {};
+      headers.forEach((h, i) => obj[h] = values[i] || '');
+      return obj;
+    });
+  }
 
-  return result;
-}
+  function parseCSVLine(line) {
+    const result = [];
+    let current = '', inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') {
+        if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
+        else inQuotes = !inQuotes;
+      } else if (c === ',' && !inQuotes) {
+        result.push(current); current = '';
+      } else {
+        current += c;
+      }
+    }
+    result.push(current);
+    return result;
+  }
 
-function renderTable(rows) {
-  const tbody = document.querySelector('#certTable tbody');
-  tbody.innerHTML = '';
+  /* ── Search ── */
+  document.getElementById('searchInput').addEventListener('input', function () {
+    render(this.value.trim());
+  });
 
-  rows.forEach(row => {
-    const tr = document.createElement('tr');
+  /* ── Render ── */
+  function render(query) {
+    const q = query.toLowerCase();
 
-    const issuerTd = document.createElement('td');
-    issuerTd.textContent = row["Issuer name"] || '';
+    const rows = q
+      ? allRows.filter(r =>
+          (r['Issuer name'] || '').toLowerCase().includes(q) ||
+          (r['Certificate name'] || '').toLowerCase().includes(q)
+        )
+      : allRows;
 
-    const certTd = document.createElement('td');
-    certTd.textContent = row["Certificate name"] || '';
+    const countEl = document.getElementById('resultCount');
+    countEl.textContent = q
+      ? `${rows.length} / ${allRows.length}`
+      : `${allRows.length} total`;
 
-    const verificationTd = document.createElement('td');
+    const list = document.getElementById('cardList');
 
-    const verification = row["Verification"] || '';
-    const verificationUrl = row["Verification URL"] || '';
-
-    if (verification && verificationUrl) {
-      const link = document.createElement('a');
-      link.href = verificationUrl;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      link.textContent = verification;
-
-      verificationTd.appendChild(link);
-    } else if (verification) {
-      verificationTd.textContent = verification;
+    if (rows.length === 0) {
+      list.innerHTML = `<div class="state-msg"><span>∅</span>No certificates match "${esc(query)}"</div>`;
+      return;
     }
 
-    tr.appendChild(issuerTd);
-    tr.appendChild(certTd);
-    tr.appendChild(verificationTd);
+    list.innerHTML = rows.map((r, i) => {
+      const name         = r['Certificate name'] || '';
+      const issuer       = r['Issuer name'] || '';
+      const verification = r['Verification'] || '';
+      const url          = r['Verification URL'] || '';
 
-    tbody.appendChild(tr);
-  });
-}
+      let verHtml = '';
+      if (verification && url) {
+        verHtml = `<a class="verify-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${hl(verification, q)}</a>`;
+      } else if (verification) {
+        verHtml = `<span class="verify-text">${hl(verification, q)}</span>`;
+      }
 
-loadCSV();
+      return `<div class="cert-card" style="animation-delay:${i * 18}ms">
+        <div class="cert-name">${hl(name, q)}</div>
+        <div class="cert-issuer">${hl(issuer, q)}</div>
+        <div class="cert-verify">${verHtml}</div>
+      </div>`;
+    }).join('');
+  }
+
+  /* ── Helpers ── */
+  function hl(text, query) {
+    if (!query) return esc(text);
+    const re = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    return esc(text).replace(re, '<mark>$1</mark>');
+  }
+
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  loadCSV();
 </script>
 
 </body>
