@@ -453,22 +453,11 @@
 
       const logo = `<div class="issuer-logo"><span class="issuer-initials">${esc(logoInitials(issuer))}</span></div>`;
 
-      let verHtml = '';
-      if (verif && url) {
-        verHtml = `<a class="verify-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">
-          <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M6 3H3a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M9 2h5v5M14 2 8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Show credential
-        </a>`;
-      } else if (verif) {
-        verHtml = `<span class="verify-text">${hl(verif, q)}</span>`;
-      }
-
       return `<div class="cert-card" style="animation-delay:${Math.min(i * 15, 300)}ms">
         ${logo}
         <div class="cert-info">
           <div class="cert-name">${hl(name, q)}</div>
           <div class="cert-issuer">${hl(issuer, q)}</div>
-          ${verHtml}
         </div>
       </div>`;
     }).join('');
