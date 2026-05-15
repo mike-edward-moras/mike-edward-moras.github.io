@@ -249,15 +249,13 @@
     .cert-action { display: none; }
 
     .verify-link {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 11px;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 12px;
       font-weight: 400;
       color: var(--accent);
       text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      margin-top: 5px;
+      display: inline-block;
+      margin-top: 4px;
       transition: color 0.15s;
     }
 
@@ -453,11 +451,19 @@
 
       const logo = `<div class="issuer-logo"><span class="issuer-initials">${esc(logoInitials(issuer))}</span></div>`;
 
+      let verHtml = '';
+      if (verif && url) {
+        verHtml = `<a class="verify-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">Show credential</a>`;
+      } else if (verif) {
+        verHtml = `<span class="verify-text">${hl(verif, q)}</span>`;
+      }
+
       return `<div class="cert-card" style="animation-delay:${Math.min(i * 15, 300)}ms">
         ${logo}
         <div class="cert-info">
           <div class="cert-name">${hl(name, q)}</div>
           <div class="cert-issuer">${hl(issuer, q)}</div>
+          ${verHtml}
         </div>
       </div>`;
     }).join('');
