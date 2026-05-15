@@ -4,248 +4,305 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mike Edward Moras : Certificates</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #0f0f0f;
-      --surface:   #181818;
-      --surface2:  #202020;
-      --border:    #2a2a2a;
-      --border2:   #333;
-      --text:      #e8e4dc;
-      --muted:     #706b60;
-      --accent:    #c9a96e;
-      --accent-dim:#7a5f32;
-      --link:      #c9a96e;
-      --link-hover:#e0c08a;
-      --mark-bg:   rgba(201,169,110,0.22);
-      --mark-text: #e0c08a;
+      --bg:           #F3F2EE;
+      --surface:      #FFFFFF;
+      --surface2:     #F8F7F4;
+      --border:       #E0DDD8;
+      --border2:      #C8C4BC;
+      --text:         #191919;
+      --text-secondary: #4B4B4B;
+      --muted:        #8F8F8F;
+      --accent:       #0A66C2;
+      --accent-hover: #084FA0;
+      --accent-light: #EAF2FD;
+      --accent-dim:   #B8D4F5;
+      --green:        #057642;
+      --green-light:  #E8F5EE;
+      --shadow-sm:    0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md:    0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
     }
 
     html { scroll-behavior: smooth; }
 
     body {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'IBM Plex Sans', sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      padding: 56px 40px 80px;
-      max-width: 900px;
+      padding: 32px 20px 80px;
+    }
+
+    .page-wrapper {
+      max-width: 860px;
       margin: 0 auto;
     }
 
-    /* ── Header ── */
-    header {
-      margin-bottom: 48px;
+    /* ── Profile Card Header ── */
+    .profile-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 16px;
+      overflow: hidden;
       opacity: 0;
-      animation: fadeUp 0.6s ease forwards;
+      animation: fadeUp 0.5s ease forwards;
     }
 
-    h1 {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 12px;
+    .profile-body {
+      padding: 24px 24px 24px;
+      position: relative;
     }
 
-    h2 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(36px, 6vw, 56px);
+    .profile-name {
+      font-size: 22px;
       font-weight: 600;
-      line-height: 1.05;
-      letter-spacing: -0.5px;
       color: var(--text);
+      line-height: 1.2;
+      margin-bottom: 2px;
     }
 
-    .header-rule {
-      margin-top: 20px;
-      height: 1px;
-      background: linear-gradient(to right, var(--accent-dim), transparent);
+    .profile-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 8px;
     }
-    .title-link {
-      text-decoration: none;
-      color: var(--text);
-    }
-    .linkedin-link {
-      font-family: 'DM Mono', monospace;
+
+    .linkedin-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'IBM Plex Mono', monospace;
       font-size: 11px;
+      font-weight: 500;
       color: var(--accent);
       text-decoration: none;
-    }
-    .linkedin-link:hover {
-      background: var(--accent);
-      color: var(--bg);
-    }
-    /* ── Search ── */
-    .search-bar {
-      margin-bottom: 32px;
-      opacity: 0;
-      animation: fadeUp 0.6s 0.1s ease forwards;
+      background: var(--accent-light);
+      border: 1px solid var(--accent-dim);
+      border-radius: 4px;
+      padding: 4px 10px;
+      transition: background 0.15s, color 0.15s;
+      letter-spacing: 0.3px;
     }
 
+    .linkedin-badge:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .linkedin-badge svg { flex-shrink: 0; }
+
+    .cert-count-pill {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 12px;
+    }
+
+    /* ── Section Card ── */
+    .section-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      opacity: 0;
+      animation: fadeUp 0.5s 0.1s ease forwards;
+    }
+
+    .section-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* ── Search ── */
     .search-inner {
       display: flex;
       align-items: center;
-      gap: 12px;
-      background: var(--surface);
-      border: 1px solid var(--border2);
+      gap: 10px;
+      background: var(--bg);
+      border: 1.5px solid var(--border2);
+      border-radius: 24px;
       padding: 0 16px;
-      transition: border-color 0.2s;
+      min-width: 260px;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     .search-inner:focus-within {
-      border-color: var(--accent-dim);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(10,102,194,0.12);
     }
 
-    .search-icon {
-      color: var(--muted);
-      flex-shrink: 0;
-    }
+    .search-icon { color: var(--muted); flex-shrink: 0; }
 
     #searchInput {
       flex: 1;
       background: none;
       border: none;
       outline: none;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 15px;
-      font-weight: 300;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 400;
       color: var(--text);
-      padding: 14px 0;
+      padding: 10px 0;
       caret-color: var(--accent);
     }
 
     #searchInput::placeholder { color: var(--muted); }
 
     .result-count {
-      font-family: 'DM Mono', monospace;
+      font-family: 'IBM Plex Mono', monospace;
       font-size: 11px;
       color: var(--muted);
       white-space: nowrap;
-      flex-shrink: 0;
     }
 
-    /* ── Cards ── */
-    #cardList {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      opacity: 0;
-      animation: fadeUp 0.6s 0.2s ease forwards;
-    }
+    /* ── Cert List ── */
+    #cardList { display: flex; flex-direction: column; }
 
     .cert-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      padding: 20px 24px;
       display: grid;
-      grid-template-columns: 1fr auto;
-      grid-template-rows: auto auto;
-      column-gap: 24px;
-      row-gap: 6px;
+      grid-template-columns: 44px 1fr auto;
       align-items: center;
-      transition: background 0.15s, border-color 0.15s;
-      animation: fadeIn 0.3s ease both;
+      gap: 0 16px;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.12s;
+      animation: fadeIn 0.25s ease both;
+      cursor: default;
     }
 
-    .cert-card:hover {
-      background: var(--surface2);
-      border-color: var(--border2);
+    .cert-card:last-child { border-bottom: none; }
+    .cert-card:hover { background: var(--surface2); }
+
+    /* Issuer logo placeholder */
+    .issuer-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
     }
+
+    .issuer-initials {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .cert-info { min-width: 0; }
 
     .cert-name {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 500;
       color: var(--text);
       line-height: 1.3;
-      grid-column: 1;
-      grid-row: 1;
+      margin-bottom: 3px;
     }
 
     .cert-issuer {
       font-size: 13px;
-      font-weight: 300;
-      color: var(--muted);
-      grid-column: 1;
-      grid-row: 2;
+      font-weight: 400;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .cert-verify {
-      grid-column: 2;
-      grid-row: 1 / 3;
-      align-self: center;
-      justify-self: end;
+    .issuer-dot {
+      width: 3px; height: 3px;
+      border-radius: 50%;
+      background: var(--border2);
+      flex-shrink: 0;
     }
+
+    .cert-action { flex-shrink: 0; }
 
     .verify-link {
-      font-family: 'DM Mono', monospace;
+      font-family: 'IBM Plex Mono', monospace;
       font-size: 11px;
-      letter-spacing: 0.8px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
       text-transform: uppercase;
       color: var(--accent);
       text-decoration: none;
-      border: 1px solid var(--accent-dim);
-      padding: 5px 12px;
+      border: 1.5px solid var(--accent-dim);
+      border-radius: 20px;
+      padding: 5px 14px;
       display: inline-block;
-      max-width: calc(8ch + 24px); /* 8ch text + padding */
-      overflow: hidden;
-      text-overflow: ellipsis;
       white-space: nowrap;
-      vertical-align: middle;
-      transition: background 0.15s, color 0.15s;
+      background: var(--accent-light);
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
     }
 
     .verify-link:hover {
       background: var(--accent);
-      color: var(--bg);
+      color: #fff;
+      border-color: var(--accent);
     }
 
     .verify-text {
-      font-family: 'DM Mono', monospace;
+      font-family: 'IBM Plex Mono', monospace;
       font-size: 11px;
       color: var(--muted);
-      display: inline-block;
-      max-width: 8ch;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      vertical-align: middle;
     }
 
     /* highlight */
     mark {
-      background: var(--mark-bg);
-      color: var(--mark-text);
+      background: #FFF3C4;
+      color: #7A5700;
       border-radius: 2px;
       padding: 0 1px;
     }
 
-    /* ── Empty / loading states ── */
+    /* ── Empty / loading ── */
     .state-msg {
-      padding: 60px 0;
+      padding: 56px 0;
       text-align: center;
       color: var(--muted);
       font-size: 14px;
-      font-weight: 300;
-      letter-spacing: 0.3px;
     }
 
-    .state-msg span {
+    .state-msg .state-icon {
       display: block;
-      font-family: 'DM Mono', monospace;
-      font-size: 28px;
+      font-size: 32px;
       color: var(--border2);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     /* ── Animations ── */
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(12px); }
+      from { opacity: 0; transform: translateY(10px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
@@ -253,117 +310,92 @@
       from { opacity: 0; }
       to   { opacity: 1; }
     }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      body { padding: 16px 12px 60px; }
+      .section-header { flex-direction: column; align-items: flex-start; }
+      .search-inner { min-width: 0; width: 100%; }
+      .cert-card { grid-template-columns: 38px 1fr; }
+      .cert-action { display: none; }
+    }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1 class="eyebrow">Mike Edward Moras</h1>
-    <h2><a class="title-link" href="https://mike-edward-moras.github.io/">Certificates</a></h2>
-    <div class="header-rule"></div>
-    <p><a class="linkedin-link" href="https://linkedin.com/in/mike-edward-moras" target="_blank">linkedin.com/in/mike-edward-moras</a></p>
-  </header>
-                   
-  <div class="search-bar">
-    <div class="search-inner">
-      <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.4"/>
-        <line x1="10.5" y1="10.5" x2="14" y2="14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-      </svg>
-      <input type="text" id="searchInput" placeholder="Search by issuer or certificate…" autocomplete="off" spellcheck="false">
-      <span class="result-count" id="resultCount"></span>
+<div class="page-wrapper">
+
+  <!-- Profile Card -->
+  <div class="profile-card">
+    <div class="profile-body">
+      <div class="profile-name">Mike Edward Moras</div>
+      <div class="profile-meta">
+        <a class="linkedin-badge" href="https://linkedin.com/in/mike-edward-moras" target="_blank" rel="noopener noreferrer">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+          </svg>
+          linkedin.com/in/mike-edward-moras
+        </a>
+        <span class="cert-count-pill" id="headerCount">— certificates</span>
+      </div>
     </div>
   </div>
 
-  <div id="cardList">
-    <div class="state-msg"><span>·</span>Loading…</div>
+  <!-- Certificates Section -->
+  <div class="section-card">
+    <div class="section-header">
+      <h2 class="section-title">Licenses &amp; Certifications</h2>
+      <div class="search-inner">
+        <svg class="search-icon" width="15" height="15" viewBox="0 0 16 16" fill="none">
+          <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="10.5" y1="10.5" x2="14" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Search certificates…" autocomplete="off" spellcheck="false">
+        <span class="result-count" id="resultCount"></span>
+      </div>
+    </div>
+
+    <div id="cardList">
+      <div class="state-msg"><span class="state-icon">·</span>Loading…</div>
+    </div>
   </div>
+
+</div><!-- /page-wrapper -->
 
 <script>
   let allRows = [];
 
-  /* ── Fetch ── */
   async function loadCSV() {
     const res = await fetch('Certificates.csv?v=' + Date.now());
     const text = await res.text();
     allRows = parseCSV(text);
 
-    /* ── Issuer weights ──────────────────────────────────────────────
-       Scale 0–100. Higher = more employer-recognised.
-       Unknown / unlisted issuers fall back to 0 (neutral / lowest).
-    ──────────────────────────────────────────────────────────────── */
     const ISSUER_WEIGHTS = {
-      // ── Tier 1 · Global tech & finance giants (85–95) ──
-      'Google':                            95,
-      'Microsoft':                         95,
-      'Goldman Sachs':                     92,
-      'IBM':                               88,
-      'Cisco':                             88,
-      'University of Pennsylvania':        85,
-
-      // ── Tier 2 · Major companies & prestigious institutions (75–84) ──
-      'Deloitte':                          82,
-      'Bloomberg':                         82,
-      'Mastercard':                        82,
-      'Accenture':                         80,
-      'Clifford Chance':                   80,
-      'Citi':                              80,
-      'Herbert Smith Freehills':           78,
-      'DLA Piper':                         76,
-      'Lloyds Banking Group':              75,
-      'Standard Chartered':               75,
-
-      // ── Tier 3 · Well-known companies, universities, govt (60–74) ──
-      'AIG':                               72,
-      'Anthropic':                         72,
-      'FEMA':                              72,
-      'University of Maryland':            70,
-      'Tata Group':                        70,
-      'PNC':                               70,
-      'The State University of New York':  65,
-      'EC-Council':                        65,
-      'UKAS':                              62,
-      'Dataiku':                           60,
-      'Leo Cussen Centre for Law':         60,
-      'Santander Open Academy':            60,
-
-      // ── Tier 4 · Online platforms with brand recognition (40–59) ──
-      'LinkedIn':                          58,
-      'Coursera':                          55,
-      'Datacom':                           52,
-      'The LEGO Foundation':              52,
-      'Cognitive Class':                   50,
-      'HP LIFE':                           50,
-      'Cybrary':                           48,
-      'FutureLearn':                       45,
-      'International Six Sigma Institute™': 45,
-      'Saylor University':                 42,
-      'atingi.org':                        42,
-
-      // ── Tier 5 · Lesser-known / self-cert platforms (20–39) ──
-      'SkillFront':                        35,
-      'Cursa':                             28,
-      'CourseStack, Inc':                  20,
+      'Google': 95, 'Microsoft': 95, 'Goldman Sachs': 92, 'IBM': 88, 'Cisco': 88,
+      'University of Pennsylvania': 85, 'Deloitte': 82, 'Bloomberg': 82, 'Mastercard': 82,
+      'Accenture': 80, 'Clifford Chance': 80, 'Citi': 80, 'Herbert Smith Freehills': 78,
+      'DLA Piper': 76, 'Lloyds Banking Group': 75, 'Standard Chartered': 75, 'AIG': 72,
+      'Anthropic': 72, 'FEMA': 72, 'University of Maryland': 70, 'Tata Group': 70, 'PNC': 70,
+      'The State University of New York': 65, 'EC-Council': 65, 'UKAS': 62, 'Dataiku': 60,
+      'Leo Cussen Centre for Law': 60, 'Santander Open Academy': 60, 'LinkedIn': 58,
+      'Coursera': 55, 'Datacom': 52, 'The LEGO Foundation': 52, 'Cognitive Class': 50,
+      'HP LIFE': 50, 'Cybrary': 48, 'FutureLearn': 45,
+      'International Six Sigma Institute™': 45, 'Saylor University': 42, 'atingi.org': 42,
+      'SkillFront': 35, 'Cursa': 28, 'CourseStack, Inc': 20,
     };
 
-    function issuerWeight(issuerName) {
-      return ISSUER_WEIGHTS[issuerName] ?? 0;
-    }
+    function issuerWeight(n) { return ISSUER_WEIGHTS[n] ?? 0; }
 
-    /* Sort: issuer weight DESC, then issuer name ASC, then certificate name ASC */
     allRows.sort((a, b) => {
-      const wA = issuerWeight(a['Issuer name']);
-      const wB = issuerWeight(b['Issuer name']);
+      const wA = issuerWeight(a['Issuer name']), wB = issuerWeight(b['Issuer name']);
       if (wB !== wA) return wB - wA;
       const iCmp = (a['Issuer name'] || '').localeCompare(b['Issuer name'] || '');
-      if (iCmp !== 0) return iCmp;
-      return (a['Certificate name'] || '').localeCompare(b['Certificate name'] || '');
+      return iCmp !== 0 ? iCmp : (a['Certificate name'] || '').localeCompare(b['Certificate name'] || '');
     });
 
     render('');
   }
 
-  /* ── CSV parsing ── */
   function parseCSV(text) {
     const lines = text.trim().split('\n');
     const headers = parseCSVLine(lines[0]);
@@ -376,73 +408,76 @@
   }
 
   function parseCSVLine(line) {
-    const result = [];
-    let current = '', inQuotes = false;
+    const result = []; let current = '', inQuotes = false;
     for (let i = 0; i < line.length; i++) {
       const c = line[i];
       if (c === '"') {
-        if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
+        if (inQuotes && line[i+1] === '"') { current += '"'; i++; }
         else inQuotes = !inQuotes;
-      } else if (c === ',' && !inQuotes) {
-        result.push(current); current = '';
-      } else {
-        current += c;
-      }
+      } else if (c === ',' && !inQuotes) { result.push(current); current = ''; }
+      else { current += c; }
     }
     result.push(current);
     return result;
   }
 
-  /* ── Search ── */
   document.getElementById('searchInput').addEventListener('input', function () {
     render(this.value.trim());
   });
 
-  /* ── Render ── */
+  function logoInitials(name) {
+    if (!name) return '??';
+    const words = name.split(/\s+/);
+    if (words.length === 1) return name.slice(0, 2).toUpperCase();
+    return (words[0][0] + words[1][0]).toUpperCase();
+  }
+
   function render(query) {
     const q = query.toLowerCase();
-
     const rows = q
       ? allRows.filter(r =>
           (r['Issuer name'] || '').toLowerCase().includes(q) ||
-          (r['Certificate name'] || '').toLowerCase().includes(q)
-        )
+          (r['Certificate name'] || '').toLowerCase().includes(q))
       : allRows;
 
-    const countEl = document.getElementById('resultCount');
-    countEl.textContent = q
-      ? `${rows.length} / ${allRows.length}`
-      : `${allRows.length} total`;
+    document.getElementById('resultCount').textContent =
+      q ? `${rows.length} / ${allRows.length}` : '';
+    document.getElementById('headerCount').textContent =
+      `${allRows.length} certificates`;
 
     const list = document.getElementById('cardList');
 
     if (rows.length === 0) {
-      list.innerHTML = `<div class="state-msg"><span>∅</span>No certificates match "${esc(query)}"</div>`;
+      list.innerHTML = `<div class="state-msg"><span class="state-icon">∅</span>No results for "${esc(query)}"</div>`;
       return;
     }
 
     list.innerHTML = rows.map((r, i) => {
-      const name         = r['Certificate name'] || '';
-      const issuer       = r['Issuer name'] || '';
-      const verification = r['Verification'] || '';
-      const url          = r['Verification URL'] || '';
+      const name   = r['Certificate name'] || '';
+      const issuer = r['Issuer name'] || '';
+      const verif  = r['Verification'] || '';
+      const url    = r['Verification URL'] || '';
+
+      const logo = `<div class="issuer-logo"><span class="issuer-initials">${esc(logoInitials(issuer))}</span></div>`;
 
       let verHtml = '';
-      if (verification && url) {
-        verHtml = `<a class="verify-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer" title="${esc(verification)}">${hl(verification, q)}</a>`;
-      } else if (verification) {
-        verHtml = `<span class="verify-text" title="${esc(verification)}">${hl(verification, q)}</span>`;
+      if (verif && url) {
+        verHtml = `<a class="verify-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">Verify</a>`;
+      } else if (verif) {
+        verHtml = `<span class="verify-text">${hl(verif, q)}</span>`;
       }
 
-      return `<div class="cert-card" style="animation-delay:${i * 18}ms">
-        <div class="cert-name">${hl(name, q)}</div>
-        <div class="cert-issuer">${hl(issuer, q)}</div>
-        <div class="cert-verify">${verHtml}</div>
+      return `<div class="cert-card" style="animation-delay:${Math.min(i * 15, 300)}ms">
+        ${logo}
+        <div class="cert-info">
+          <div class="cert-name">${hl(name, q)}</div>
+          <div class="cert-issuer">${hl(issuer, q)}</div>
+        </div>
+        <div class="cert-action">${verHtml}</div>
       </div>`;
     }).join('');
   }
 
-  /* ── Helpers ── */
   function hl(text, query) {
     if (!query) return esc(text);
     const re = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
