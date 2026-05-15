@@ -55,9 +55,50 @@
       animation: fadeUp 0.5s ease forwards;
     }
 
-    .profile-body {
-      padding: 24px 24px 24px;
+    .profile-banner {
+      height: 80px;
+      background: linear-gradient(135deg, #0A66C2 0%, #1E8FE1 50%, #0A66C2 100%);
       position: relative;
+    }
+
+    .profile-banner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        45deg,
+        rgba(255,255,255,0.03) 0px,
+        rgba(255,255,255,0.03) 1px,
+        transparent 1px,
+        transparent 12px
+      );
+    }
+
+    .profile-body {
+      padding: 0 24px 24px;
+      position: relative;
+    }
+
+    .avatar-ring {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: 3px solid var(--surface);
+      background: linear-gradient(135deg, #0A66C2, #1E8FE1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: -36px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .avatar-initials {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 18px;
+      font-weight: 500;
+      color: #fff;
+      letter-spacing: 1px;
     }
 
     .profile-name {
@@ -184,7 +225,7 @@
 
     .cert-card {
       display: grid;
-      grid-template-columns: 44px 1fr;
+      grid-template-columns: 44px 1fr auto;
       align-items: center;
       gap: 0 16px;
       padding: 16px 24px;
@@ -246,27 +287,35 @@
       flex-shrink: 0;
     }
 
-    .cert-action { display: none; }
+    .cert-action { flex-shrink: 0; }
 
     .verify-link {
-      font-family: 'IBM Plex Sans', sans-serif;
-      font-size: 12px;
-      font-weight: 400;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
       color: var(--accent);
       text-decoration: none;
+      border: 1.5px solid var(--accent-dim);
+      border-radius: 20px;
+      padding: 5px 14px;
       display: inline-block;
-      margin-top: 4px;
-      transition: color 0.15s;
+      white-space: nowrap;
+      background: var(--accent-light);
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
     }
 
-    .verify-link:hover { color: var(--accent-hover); text-decoration: underline; }
+    .verify-link:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
 
     .verify-text {
       font-family: 'IBM Plex Mono', monospace;
       font-size: 11px;
       color: var(--muted);
-      margin-top: 5px;
-      display: inline-block;
     }
 
     /* highlight */
@@ -309,6 +358,7 @@
       .section-header { flex-direction: column; align-items: flex-start; }
       .search-inner { min-width: 0; width: 100%; }
       .cert-card { grid-template-columns: 38px 1fr; }
+      .cert-action { display: none; }
     }
   </style>
 </head>
@@ -318,7 +368,11 @@
 
   <!-- Profile Card -->
   <div class="profile-card">
+    <div class="profile-banner"></div>
     <div class="profile-body">
+      <div class="avatar-ring">
+        <span class="avatar-initials">MEM</span>
+      </div>
       <div class="profile-name">Mike Edward Moras</div>
       <div class="profile-meta">
         <a class="linkedin-badge" href="https://linkedin.com/in/mike-edward-moras" target="_blank" rel="noopener noreferrer">
@@ -453,7 +507,7 @@
 
       let verHtml = '';
       if (verif && url) {
-        verHtml = `<a class="verify-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">Show credential</a>`;
+        verHtml = `<a class="verify-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">Verify</a>`;
       } else if (verif) {
         verHtml = `<span class="verify-text">${hl(verif, q)}</span>`;
       }
@@ -463,8 +517,8 @@
         <div class="cert-info">
           <div class="cert-name">${hl(name, q)}</div>
           <div class="cert-issuer">${hl(issuer, q)}</div>
-          ${verHtml}
         </div>
+        <div class="cert-action">${verHtml}</div>
       </div>`;
     }).join('');
   }
