@@ -68,9 +68,8 @@
       margin-bottom: 2px;
     }
     .profile-name a {
-color: var(--accent);
+      color: var(--accent);
       text-decoration: none;
-      
     }
     .profile-meta {
       display: flex;
@@ -212,11 +211,11 @@ color: var(--accent);
     }
 
     .cert-issuer {
-  font-size: 13px;
-  font-weight: 400;
-  color: var(--text-secondary);
-  display: block;
-}
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      display: block;
+    }
     .cert-action { display: none; }
 
     .verify-link {
@@ -244,9 +243,9 @@ color: var(--accent);
     mark {
       background: #FFF3C4;
       color: #7A5700;
-     border-radius: 0;
-  margin: 0;
-  display: inline;
+      border-radius: 0;
+      margin: 0;
+      display: inline;
     }
 
     /* ── Empty / loading ── */
@@ -331,6 +330,15 @@ color: var(--accent);
     const res = await fetch('Certificates.csv?v=' + Date.now());
     const text = await res.text();
     allRows = parseCSV(text);
+
+    // Deduplicate by certificate name + issuer name (case-insensitive)
+    const seen = new Set();
+    allRows = allRows.filter(r => {
+      const key = `${(r['Certificate name'] || '').toLowerCase().trim()}||${(r['Issuer name'] || '').toLowerCase().trim()}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
 
     const ISSUER_WEIGHTS = {
       'Google': 94, 'Microsoft': 95, 'Goldman Sachs': 92, 'IBM': 88, 'Cisco': 88,
@@ -446,3 +454,4 @@ color: var(--accent);
 </script>
 </body>
 </html>
+
